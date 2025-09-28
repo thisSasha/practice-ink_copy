@@ -950,3 +950,198 @@ T('brandText-colors', () => {
   fitText()
   window.addEventListener("resize", fitText)
 })
+
+T('faq-accordion', () => {
+  const rows = Array.from(document.querySelectorAll('.border-b.border-solid.border-lightgray'))
+  if (!rows.length) return
+
+  const items = rows.map(row => {
+    const btn = row.querySelector('button')
+    const icon = btn?.querySelector('.transform')
+    const panel = btn?.nextElementSibling
+    if (!btn || !panel) return null
+    panel.style.display = 'block'
+    panel.style.overflow = 'hidden'
+    panel.style.maxHeight = '0px'
+    panel.style.opacity = '0'
+    panel.style.transition = 'max-height 360ms ease, opacity 240ms ease'
+    panel.setAttribute('aria-hidden', 'true')
+    btn.setAttribute('aria-expanded', 'false')
+    if (icon) {
+      icon.style.transition = 'transform 400ms ease'
+      icon.dataset.rot = icon.dataset.rot || '0'
+    }
+    return { btn, panel, icon }
+  }).filter(Boolean)
+
+  const closeItem = it => {
+    it.panel.style.maxHeight = '0px'
+    it.panel.style.opacity = '0'
+    it.panel.setAttribute('aria-hidden', 'true')
+    it.btn.setAttribute('aria-expanded', 'false')
+  }
+
+  const openItem = it => {
+    items.forEach(i => { if (i !== it) closeItem(i) })
+    it.panel.style.maxHeight = it.panel.scrollHeight + 'px'
+    it.panel.style.opacity = '1'
+    it.panel.setAttribute('aria-hidden', 'false')
+    it.btn.setAttribute('aria-expanded', 'true')
+  }
+
+  const spin = icon => {
+    if (!icon) return
+    const n = (parseInt(icon.dataset.rot || '0', 10) + 360)
+    icon.dataset.rot = String(n)
+    icon.style.transform = `rotate(${n}deg)`
+  }
+
+  items.forEach(it => {
+    it.btn.addEventListener('click', () => {
+      const expanded = it.btn.getAttribute('aria-expanded') === 'true'
+      expanded ? closeItem(it) : openItem(it)
+      spin(it.icon)
+    })
+  })
+
+  window.addEventListener('resize', () => {
+    items.forEach(it => {
+      if (it.btn.getAttribute('aria-expanded') === 'true') {
+        it.panel.style.maxHeight = it.panel.scrollHeight + 'px'
+      }
+    })
+  })
+})
+
+T('sidebar-tabs-vertical-scroll', () => {
+  const nav = document.querySelector('.sidebar-wrapper nav')
+  if (!nav) return
+  const items = Array.from(nav.querySelectorAll('li'))
+  const mapId = s => ({ who:'who', what:'what', where:'where', why:'why', lately:'lately' }[s] || s)
+  const tabs = items.map(li => {
+    const h2 = li.querySelector('h2')
+    const id = mapId((h2?.textContent || '').trim().toLowerCase())
+    const target = document.getElementById(id)
+    return target ? { li, id, target } : null
+  }).filter(Boolean)
+
+  tabs.forEach(t => {
+    t.li.addEventListener('click', e => {
+      e.preventDefault()
+      const top = t.target.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ left: window.scrollX, top, behavior: 'smooth' })
+    })
+  })
+})
+
+T('sidebar-arrows-sync', () => {
+  const nav = document.querySelector('.sidebar-wrapper nav')
+  if (!nav) return
+  const items = Array.from(nav.querySelectorAll('li'))
+  const mapId = s => ({ who:'who', what:'what', where:'where', why:'why', lately:'lately' }[s] || s)
+  const tabs = items.map(li => {
+    const h2 = li.querySelector('h2')
+    const id = mapId((h2?.textContent || '').trim().toLowerCase())
+    const svg = li.querySelector('svg')
+    if (svg) svg.style.transition = 'transform 260ms ease'
+    const section = document.getElementById(id)
+    return svg && section ? { id, svg, section, li } : null
+  }).filter(Boolean)
+
+  if (!tabs.length) return
+
+  let activeId = null
+  const setState = id => {
+    activeId = id
+    tabs.forEach(t => { t.svg.style.transform = t.id === id ? 'rotate(90deg)' : 'rotate(47deg)' })
+  }
+
+  const vis = new Map()
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => vis.set(e.target.id, e.intersectionRatio))
+    let bestId = activeId, best = -1
+    vis.forEach((r, id) => { if (r > best) { best = r; bestId = id } })
+    if (bestId && bestId !== activeId) setState(bestId)
+  }, { threshold: [0,0.15,0.3,0.5,0.7,0.9,1] })
+  tabs.forEach(t => io.observe(t.section))
+
+  let raf = 0
+  const onScroll = () => {
+    cancelAnimationFrame(raf)
+    raf = requestAnimationFrame(() => {
+      const y = window.scrollY + window.innerHeight * 0.45
+      let bestId = activeId, bestDist = Infinity
+      tabs.forEach(t => {
+        const rect = t.section.getBoundingClientRect()
+        const mid = rect.top + window.scrollY + rect.height / 2
+        const d = Math.abs(mid - y)
+        if (d < bestDist) { bestDist = d; bestId = t.id }
+      })
+      if (bestId && bestId !== activeId) setState(bestId)
+    })
+  }
+  window.addEventListener('scroll', onScroll, { passive: true })
+
+  tabs.forEach(t => {
+    t.li.addEventListener('pointerenter', () => { tabs.forEach(x => x.svg.style.transform = x.id === t.id ? 'rotate(90deg)' : 'rotate(47deg)') }, { passive: true })
+    t.li.addEventListener('pointerleave', () => { if (activeId) setState(activeId) }, { passive: true })
+  })
+
+  window.addEventListener('load', () => {
+    const first = tabs[0]?.id
+    setState(first)
+    onScroll()
+  }, { once: true })
+})
+
+
+T('sidebar-width-clamp', () => {
+  const sidebar = document.querySelector('.sidebar-wrapper')
+  const container = sidebar?.closest('.relative') || document.body
+  const rightCol = document.querySelector('.col-span-10')
+  const sections = Array.from(document.querySelectorAll('.col-span-10 section.section-content[id]'))
+
+  const visible = el => !!el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().width > 0
+
+  function fixInnerWidths(root){
+    root.querySelectorAll('[class*="max-w-screen"], [style*="max-width"]').forEach(n => { n.style.maxWidth = '100%' })
+    root.querySelectorAll('.w-screen').forEach(n => { n.style.width = '100%' })
+  }
+
+  function apply(){
+    const contW = container.getBoundingClientRect().width
+    const sbW = visible(sidebar) ? sidebar.getBoundingClientRect().width : 0
+    const avail = Math.max(0, contW - sbW)
+
+    if (rightCol){
+      rightCol.style.boxSizing = 'border-box'
+      if (visible(sidebar)){
+        rightCol.style.width = avail + 'px'
+        rightCol.style.maxWidth = avail + 'px'
+      } else {
+        rightCol.style.width = ''
+        rightCol.style.maxWidth = ''
+      }
+    }
+
+    sections.forEach(sec => {
+      sec.style.boxSizing = 'border-box'
+      if (visible(sidebar)){
+        sec.style.width = '100%'
+        sec.style.maxWidth = '100%'
+      } else {
+        sec.style.width = ''
+        sec.style.maxWidth = ''
+      }
+      fixInnerWidths(sec)
+    })
+  }
+
+  let raf = 0
+  const onResize = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(apply) }
+
+  window.addEventListener('resize', onResize, { passive: true })
+  window.addEventListener('orientationchange', onResize, { passive: true })
+  window.addEventListener('load', apply, { once: true })
+  apply()
+})
