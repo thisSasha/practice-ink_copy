@@ -23,18 +23,18 @@ T('menu-burger', () => {
     }
   }
 
-  function tintLeftBarGreen(on){
+  function tintLeftBarGreen(on) {
     const root = document.querySelector('nav.fixed')
-    if(!root) return
+    if (!root) return
     const wrap = root.querySelector('.w-full.h-full.absolute')
-    if(!wrap || wrap.children.length < 2) return
+    if (!wrap || wrap.children.length < 2) return
     const [white, green] = wrap.children
     on ? (white.classList.add('opacity-0'), green.classList.remove('opacity-0'))
-       : (green.classList.add('opacity-0'), white.classList.remove('opacity-0'))
+      : (green.classList.add('opacity-0'), white.classList.remove('opacity-0'))
   }
 
   function openMenu() {
-    const m = getMenu(); if(!m) return
+    const m = getMenu(); if (!m) return
     body.classList.add('overflow-hidden')
     m.classList.remove('-translate-x-fuller')
     m.classList.add('translate-x-0')
@@ -43,7 +43,7 @@ T('menu-burger', () => {
   }
 
   function closeMenu() {
-    const m = getMenu(); if(!m) return
+    const m = getMenu(); if (!m) return
     body.classList.remove('overflow-hidden')
     m.classList.add('-translate-x-fuller') // 48
     m.classList.remove('translate-x-0')
@@ -53,14 +53,14 @@ T('menu-burger', () => {
 
   if (btn) {
     btn.addEventListener('click', () => {
-      const m = getMenu(); if(!m) return
+      const m = getMenu(); if (!m) return
       const closed = !m.classList.contains('translate-x-0')
       closed ? openMenu() : closeMenu()
     })
   }
 
-  ;(() => {
-    const root = getMenu(); if(!root) return
+  ; (() => {
+    const root = getMenu(); if (!root) return
     root.querySelectorAll('a').forEach(el => {
       el.addEventListener('click', () => {
         if (root.classList.contains('translate-x-0')) closeMenu()
@@ -238,8 +238,8 @@ T('work-view-switch', () => {
 
     section.querySelectorAll('.work-button, .work-button-container').forEach(el => el.classList.toggle('is-list', isList))
 
-    const $ = (sel, root=document) => root.querySelector(sel)
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel))
+    const $ = (sel, root = document) => root.querySelector(sel)
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel))
     const txt = (el) => (el ? el.textContent.trim() : '')
 
     const slugify = (s) => {
@@ -275,7 +275,7 @@ T('work-view-switch', () => {
       return { img, h2HTML, tag: txt(tag), desc: txt(desc), brand: brandRaw, slug: slugify(brandRaw) }
     }
 
-    const buildListItem = ({img, h2HTML, tag, desc, brand, slug}) => {
+    const buildListItem = ({ img, h2HTML, tag, desc, brand, slug }) => {
       const li = document.createElement('li')
       li.className = 'px-5 lg:px-6'
       li.dataset.case = '1'
@@ -303,7 +303,7 @@ T('work-view-switch', () => {
       return li
     }
 
-    const buildGridCard = ({img, h2HTML, tag, desc, brand, slug}) => {
+    const buildGridCard = ({ img, h2HTML, tag, desc, brand, slug }) => {
       const wrap = document.createElement('div')
       wrap.className = 'flex flex-col relative w-full cursor-pointer'
       wrap.dataset.case = '1'
@@ -372,7 +372,7 @@ T('work-view-switch', () => {
     }
   }
 
-  window.workView = (btn, mode) => { try { workView(btn, mode) } catch(e) { if (window?.LATELY_DEBUG) console.error('[workView]', e) } }
+  window.workView = (btn, mode) => { try { workView(btn, mode) } catch (e) { if (window?.LATELY_DEBUG) console.error('[workView]', e) } }
 })
 
 T('newsletter-eye', () => {
@@ -384,92 +384,92 @@ T('newsletter-eye', () => {
   const outer = eye?.querySelector('circle:nth-child(1)')
   const svg = eye?.closest('svg')
 
-  if(!zone||!tray||!cursor){ return }
+  if (!zone || !tray || !cursor) { return }
 
-  if(!tray.classList.contains('translate-x-full') && !tray.classList.contains('translate-x-0')){
-    tray.classList.add('transform-gpu','translate-x-full')
+  if (!tray.classList.contains('translate-x-full') && !tray.classList.contains('translate-x-0')) {
+    tray.classList.add('transform-gpu', 'translate-x-full')
   }
 
-  let over=false, mx=0, my=0, ex=0, ey=0
+  let over = false, mx = 0, my = 0, ex = 0, ey = 0
   const baseTF = eye?.getAttribute('transform') || ''
   const maxShift = 22
 
-  function toSVG(x,y){
-    if(!svg?.getScreenCTM) return {x,y}
-    const pt = svg.createSVGPoint(); pt.x=x; pt.y=y
-    const m = svg.getScreenCTM(); if(!m) return {x,y}
+  function toSVG(x, y) {
+    if (!svg?.getScreenCTM) return { x, y }
+    const pt = svg.createSVGPoint(); pt.x = x; pt.y = y
+    const m = svg.getScreenCTM(); if (!m) return { x, y }
     return pt.matrixTransform(m.inverse())
   }
 
-  function insideZone(x,y){
+  function insideZone(x, y) {
     const r = zone.getBoundingClientRect()
-    return x>=r.left && x<=r.right && y>=r.top && y<=r.bottom
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
   }
 
-  function eyeTick(){
-    if(over && eye && outer){
-      const cx = parseFloat(outer.getAttribute('cx'))||0
-      const cy = parseFloat(outer.getAttribute('cy'))||0
-      const p = toSVG(mx,my)
+  function eyeTick() {
+    if (over && eye && outer) {
+      const cx = parseFloat(outer.getAttribute('cx')) || 0
+      const cy = parseFloat(outer.getAttribute('cy')) || 0
+      const p = toSVG(mx, my)
       const dx = p.x - cx, dy = p.y - cy
-      const len = Math.hypot(dx,dy)||1
-      const k = Math.min(maxShift,len)/len
-      const tx = dx*k, ty = dy*k
-      ex += (tx-ex)*0.18
-      ey += (ty-ey)*0.18
+      const len = Math.hypot(dx, dy) || 1
+      const k = Math.min(maxShift, len) / len
+      const tx = dx * k, ty = dy * k
+      ex += (tx - ex) * 0.18
+      ey += (ty - ey) * 0.18
       eye.setAttribute('transform', `${baseTF} translate(${ex.toFixed(2)} ${ey.toFixed(2)})`)
     }
     requestAnimationFrame(eyeTick)
   }
 
-  function showCursor(){
-    if(over) return
+  function showCursor() {
+    if (over) return
     over = true
     document.body.style.cursor = 'none'
     cursor.classList.remove('opacity-0')
   }
 
-  function hideCursor(){
-    if(!over) return
+  function hideCursor() {
+    if (!over) return
     over = false
     document.body.style.cursor = ''
     cursor.classList.add('opacity-0')
-    if(eye) { eye.setAttribute('transform', baseTF); ex=0; ey=0 }
+    if (eye) { eye.setAttribute('transform', baseTF); ex = 0; ey = 0 }
   }
 
-  function onMove(e){
+  function onMove(e) {
     mx = e.clientX; my = e.clientY
     cursor.style.left = mx + 'px'
-    cursor.style.top  = my + 'px'
-    if(!over && insideZone(mx,my)) showCursor()
+    cursor.style.top = my + 'px'
+    if (!over && insideZone(mx, my)) showCursor()
   }
 
-  function openTray(){
+  function openTray() {
     tray.classList.remove('translate-x-full')
     tray.classList.add('translate-x-0')
   }
 
-  function closeTray(){
+  function closeTray() {
     tray.classList.remove('translate-x-0')
     tray.classList.add('translate-x-full')
     hideCursor()
   }
 
-  function onScroll(){
-    if(over && !insideZone(mx,my)) hideCursor()
+  function onScroll() {
+    if (over && !insideZone(mx, my)) hideCursor()
   }
 
-  zone.addEventListener('pointerenter', showCursor, {passive:true})
-  zone.addEventListener('pointerleave', hideCursor, {passive:true})
-  zone.addEventListener('pointermove', onMove, {passive:true})
+  zone.addEventListener('pointerenter', showCursor, { passive: true })
+  zone.addEventListener('pointerleave', hideCursor, { passive: true })
+  zone.addEventListener('pointermove', onMove, { passive: true })
   zone.addEventListener('click', openTray)
-  closeBtn?.addEventListener('click', (e)=>{ e.preventDefault(); closeTray() })
+  closeBtn?.addEventListener('click', (e) => { e.preventDefault(); closeTray() })
 
-  document.addEventListener('scroll', onScroll, {passive:true})
-  window.addEventListener('scroll', onScroll, {passive:true})
-  window.addEventListener('blur', hideCursor, {passive:true})
+  document.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('blur', hideCursor, { passive: true })
 
-  cursor.style.left='0px'; cursor.style.top='0px'
+  cursor.style.left = '0px'; cursor.style.top = '0px'
   requestAnimationFrame(eyeTick)
 })
 
@@ -725,10 +725,10 @@ T('phase-nav-A', () => {
   const nav = document.querySelector('.phase-nav')
   if (!nav) return
   const trackHost = nav.querySelector('.relative.py-5') || nav.querySelector('.relative')
-  const dot = nav.querySelector('.w-2.h-2.rounded-full') || (() => { const e=document.createElement('div'); e.className='absolute w-2 h-2 bg-black rounded-full top-1/3 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out z-5'; e.style.left='0px'; trackHost.appendChild(e); return e })()
+  const dot = nav.querySelector('.w-2.h-2.rounded-full') || (() => { const e = document.createElement('div'); e.className = 'absolute w-2 h-2 bg-black rounded-full top-1/3 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out z-5'; e.style.left = '0px'; trackHost.appendChild(e); return e })()
   const btnsAll = Array.from(nav.querySelectorAll('button'))
   const phaseBtns = btnsAll.filter(b => /Phase\s+\d/i.test(b.textContent))
-  const sections = [1,2,3,4].map(n => document.getElementById(`phase-${n}`)).filter(Boolean)
+  const sections = [1, 2, 3, 4].map(n => document.getElementById(`phase-${n}`)).filter(Boolean)
   if (phaseBtns.length !== sections.length) return
 
   let centers = []
@@ -805,9 +805,9 @@ T('phase-nav-A', () => {
 })
 
 T('phase-nav-B', () => {
-  document.querySelectorAll('.phase-nav').forEach(el=>{
-    el.style.opacity='1'
-    el.style.transform='translateY(0)'
+  document.querySelectorAll('.phase-nav').forEach(el => {
+    el.style.opacity = '1'
+    el.style.transform = 'translateY(0)'
     el.classList.remove('nav-fade-out')
   })
 })
@@ -819,10 +819,10 @@ T('phase-nav-progress', () => {
   const dot = nav.querySelector('.w-2.h-2.rounded-full')
   const btnsAll = Array.from(nav.querySelectorAll('button'))
   const phaseBtns = btnsAll.filter(b => /Phase\s+\d/i.test(b.textContent))
-  const sections = [1,2,3,4].map(n => document.getElementById(`phase-${n}`)).filter(Boolean)
+  const sections = [1, 2, 3, 4].map(n => document.getElementById(`phase-${n}`)).filter(Boolean)
   if (!dot || phaseBtns.length !== sections.length) return
 
-  const colors = ['#0C7D4B','#2C4D83','#C92A2A','yellow']
+  const colors = ['#0C7D4B', '#2C4D83', '#C92A2A', 'yellow']
   let centers = []
 
   const measure = () => {
@@ -936,19 +936,22 @@ T('observe-fade-in', () => {
 
 T('brandText-colors', () => {
   const colors = ["#2e8b57", "#2563eb", "#b22222", "#daa520"]
-  const el = document.getElementById("brandText")
-  if (!el) return
-  const text = el.textContent.trim()
-  el.innerHTML = ""
-  ;[...text].forEach((ch, i) => {
-    const span = document.createElement("span")
-    span.textContent = ch
-    span.style.color = colors[i % colors.length]
-    el.appendChild(span)
+  const els = document.querySelectorAll("#brandText")
+  if (!els.length) return
+  els.forEach(el => {
+    const text = el.textContent.trim()
+    el.innerHTML = ""
+      ;[...text].forEach((ch, i) => {
+        const span = document.createElement("span")
+        span.textContent = ch
+        span.style.color = colors[i % colors.length]
+        el.appendChild(span)
+      })
+    function fitText() { el.style.fontSize = "200px" }
+    if (!el.style.fontSize)
+      fitText()
+    window.addEventListener("resize", fitText)
   })
-  function fitText() { el.style.fontSize = "200px" }
-  fitText()
-  window.addEventListener("resize", fitText)
 })
 
 T('faq-accordion', () => {
@@ -1017,7 +1020,7 @@ T('sidebar-tabs-vertical-scroll', () => {
   const nav = document.querySelector('.sidebar-wrapper nav')
   if (!nav) return
   const items = Array.from(nav.querySelectorAll('li'))
-  const mapId = s => ({ who:'who', what:'what', where:'where', why:'why', lately:'lately' }[s] || s)
+  const mapId = s => ({ who: 'who', what: 'what', where: 'where', why: 'why', lately: 'lately' }[s] || s)
   const tabs = items.map(li => {
     const h2 = li.querySelector('h2')
     const id = mapId((h2?.textContent || '').trim().toLowerCase())
@@ -1038,7 +1041,7 @@ T('sidebar-arrows-sync', () => {
   const nav = document.querySelector('.sidebar-wrapper nav')
   if (!nav) return
   const items = Array.from(nav.querySelectorAll('li'))
-  const mapId = s => ({ who:'who', what:'what', where:'where', why:'why', lately:'lately' }[s] || s)
+  const mapId = s => ({ who: 'who', what: 'what', where: 'where', why: 'why', lately: 'lately' }[s] || s)
   const tabs = items.map(li => {
     const h2 = li.querySelector('h2')
     const id = mapId((h2?.textContent || '').trim().toLowerCase())
@@ -1062,7 +1065,7 @@ T('sidebar-arrows-sync', () => {
     let bestId = activeId, best = -1
     vis.forEach((r, id) => { if (r > best) { best = r; bestId = id } })
     if (bestId && bestId !== activeId) setState(bestId)
-  }, { threshold: [0,0.15,0.3,0.5,0.7,0.9,1] })
+  }, { threshold: [0, 0.15, 0.3, 0.5, 0.7, 0.9, 1] })
   tabs.forEach(t => io.observe(t.section))
 
   let raf = 0
@@ -1103,19 +1106,19 @@ T('sidebar-width-clamp', () => {
 
   const visible = el => !!el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().width > 0
 
-  function fixInnerWidths(root){
+  function fixInnerWidths(root) {
     root.querySelectorAll('[class*="max-w-screen"], [style*="max-width"]').forEach(n => { n.style.maxWidth = '100%' })
     root.querySelectorAll('.w-screen').forEach(n => { n.style.width = '100%' })
   }
 
-  function apply(){
+  function apply() {
     const contW = container.getBoundingClientRect().width
     const sbW = visible(sidebar) ? sidebar.getBoundingClientRect().width : 0
     const avail = Math.max(0, contW - sbW)
 
-    if (rightCol){
+    if (rightCol) {
       rightCol.style.boxSizing = 'border-box'
-      if (visible(sidebar)){
+      if (visible(sidebar)) {
         rightCol.style.width = avail + 'px'
         rightCol.style.maxWidth = avail + 'px'
       } else {
@@ -1126,7 +1129,7 @@ T('sidebar-width-clamp', () => {
 
     sections.forEach(sec => {
       sec.style.boxSizing = 'border-box'
-      if (visible(sidebar)){
+      if (visible(sidebar)) {
         sec.style.width = '100%'
         sec.style.maxWidth = '100%'
       } else {
@@ -1145,3 +1148,5 @@ T('sidebar-width-clamp', () => {
   window.addEventListener('load', apply, { once: true })
   apply()
 })
+
+
